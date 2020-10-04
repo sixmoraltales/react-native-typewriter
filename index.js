@@ -1,1 +1,1 @@
-export { default } from './components/typewriter';
+export { default as default } from './components/typewriter';
