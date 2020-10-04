@@ -4,7 +4,8 @@ import { Text } from 'react-native';
 import { getTokenAt, hideSubstring } from '../utils';
 
 const DIRECTIONS = [-1, 0, 1];
-const MAX_DELAY = 100;
+const MAX_DELAY = 300;
+const MAX_LINES = 3
 
 export default class TypeWriter extends Component {
   static propTypes = {
@@ -14,22 +15,23 @@ export default class TypeWriter extends Component {
         at: PropTypes.oneOfType([
           PropTypes.string,
           PropTypes.number,
-          PropTypes.instanceOf(RegExp),
+          PropTypes.instanceOf(RegExp)
         ]),
-        delay: PropTypes.number,
-      }),
+        delay: PropTypes.number
+      })
     ),
     fixed: PropTypes.bool,
     initialDelay: PropTypes.number,
     maxDelay: PropTypes.number,
     minDelay: PropTypes.number,
+    maxLines: PropTypes.number,
     onTyped: PropTypes.func,
     onTypingEnd: PropTypes.func,
     style: PropTypes.oneOfType([
       PropTypes.object,
-      PropTypes.array,
+      PropTypes.array
     ]),
-    typing: PropTypes.oneOf(DIRECTIONS),
+    //typing: PropTypes.oneOf(DIRECTIONS)
   };
 
   static defaultProps = {
@@ -37,18 +39,18 @@ export default class TypeWriter extends Component {
     initialDelay: MAX_DELAY * 2,
     maxDelay: MAX_DELAY,
     minDelay: MAX_DELAY / 5,
+    maxLines: MAX_LINES,
     onTyped() {},
     onTypingEnd() {},
     style: {},
-    typing: 0,
+    typing: 0
   };
 
   static getDerivedStateFromProps(props, state) {
     const { typing } = props;
-    const { direction, visibleChars } = state;
 
-    if (typing !== direction) {
-      return { direction: typing, visibleChars: visibleChars + typing };
+    if (typing !== state.direction) {
+      return { direction: typing, visibleChars: state.visibleChars + typing };
     }
 
     return null;
@@ -59,7 +61,7 @@ export default class TypeWriter extends Component {
 
     this.state = {
       direction: props.typing,
-      visibleChars: 0,
+      visibleChars: 0
     };
 
     this.typeNextChar = this.typeNextChar.bind(this);
@@ -72,21 +74,16 @@ export default class TypeWriter extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { children, typing } = this.props;
+    const { typing } = this.props;
 
     this.clearTimeout();
 
     if (typing === 0) return;
 
-    if (children !== prevProps.children) {
-      this.reset();
-      return;
-    }
-
     const {
       delayMap,
       onTyped,
-      onTypingEnd,
+      onTypingEnd
     } = this.props;
     const { visibleChars } = this.state;
     const currentToken = getTokenAt(this, prevState.visibleChars);
@@ -126,16 +123,9 @@ export default class TypeWriter extends Component {
   }
 
   clearTimeout() {
-    if (this.timeoutId != null) {
+    if (this.timeoutId) {
       clearTimeout(this.timeoutId);
-      this.timeoutId = null;
     }
-  }
-
-  reset() {
-    const { initialDelay } = this.props;
-
-    this.setState({ visibleChars: 0 }, () => this.startTyping(initialDelay));
   }
 
   startTyping(delay) {
@@ -144,7 +134,7 @@ export default class TypeWriter extends Component {
 
   typeNextChar() {
     this.setState(({ direction, visibleChars }) => ({
-      visibleChars: visibleChars + direction,
+      visibleChars: visibleChars + direction
     }));
   }
 
@@ -163,7 +153,7 @@ export default class TypeWriter extends Component {
     } = this.props;
     const { visibleChars } = this.state;
     const component = (
-      <Text {...rest}>
+      <Text numberOfLines={2} {...rest}>
         {children}
       </Text>
     );
